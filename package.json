@@ -1,0 +1,16 @@
+{
+  "name": "KaitenNX",
+  "version": "0.0.1",
+  "description": "Next generation kaiten based interface.",
+  "main": "app.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "author": "",
+  "license": "ISC",
+  "devDependencies": {
+    "karma": "^0.12.14",
+    "karma-chrome-launcher": "^0.1.3",
+    "karma-jasmine": "^0.1.5"
+  }
+}
