@@ -1,11 +1,19 @@
-.kaitennx_container {
+.kaitennx-container {
 	min-height:100px;
 }
 
-.kaitennx-frame {
+.kaitennx-container .frame {
 	border-style: solid;
 	border-width: 1px;
 	display: inline-block;
 	min-width: 100px;
 	height: 100%;
+}
+
+.kaitennx-container .frame .title {
+	background-color:#0066FF;
+}
+
+.kaitennx-container .frame .close {
+
 }
