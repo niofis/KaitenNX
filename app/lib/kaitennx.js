@@ -2,14 +2,14 @@
 
 (function () {
 
-	var container = document.getElementsByClassName('kaitennx-container')[0];
+	var container = document.getElementsByClassName('knx-container')[0];
 	var w = window.innerWidth;
 	var h = window.innerHeight;
 	//console.log(container,container.clientWidth, container.clientHeight,w,h)
 
 	var Frame = (function () {
 
-		function createElement () {
+		function createElement (onclose) {
 			var main = document.createElement('DIV');
 			main.className = 'frame';
 
@@ -24,7 +24,7 @@
 			a_close.style.cssText = "float:right;";
 			a_close.href = "javascript:;";
 			a_close.onclick = function () {
-				container.removeChild(main);
+				onclose();
 			}
 			title.appendChild(a_close);
 			return main;
@@ -33,14 +33,37 @@
 		var frm = function () {
 			var self = this;
 
-			self.element = createElement();
+			self.element = createElement(self.close.bind(self));
+
 			self.listeners = {
 				close: []
 			}
+
+		}
+
+		frm.prototype.focus = function () {
+			var self = this;
+			var rect = self.element.getBoundingClientRect();
+/*
+			$(container).animate({
+		        scrollLeft: rect.left + rect.width + $(container).scrollLeft()
+		    }, 300);*/
+		    self.element.scrollIntoView();
 		}
 
 		frm.prototype.close = function () {
+			var self = this;
+			var allow_close = true;
 
+			if(self.listeners) {
+				self.listeners.close.forEach(function (fn) {
+					allow_close = allow_close && fn(this);
+				});
+			}
+
+			if(allow_close == true && container.contains(self.element)) {
+				container.removeChild(self.element);
+			}
 		}
 
 		frm.prototype.on = function (event, fn) {
@@ -61,6 +84,7 @@
 	knx.prototype.push = function () {
 		var frame = new Frame();
 		container.appendChild(frame.element);
+		frame.focus();
 		return frame;
 	}
 

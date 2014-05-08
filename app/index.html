@@ -31,10 +31,12 @@
 
   <body>
 
-    <div class="kaitennx-container" style="height:100px;">
-
+  <button type="button" onclick="addFrame()">Add</button>
+    <div class="knx-container" style="height:100px;">
 
     </div>
+
+
     <script src="lib/jquery.js"></script>
     <script src="lib/kaitennx.js"></script>
     <script src="lib/jasmine/jasmine.js"></script>
@@ -44,27 +46,9 @@
     <script src="spec/kaitennxSpec.js"></script>
 
     <script type="text/javascript">
-    /*
-      (function() {
-        var jasmineEnv = jasmine.getEnv();
-        jasmineEnv.updateInterval = 1000;
-        var trivialReporter = new jasmine.TrivialReporter();
-        jasmineEnv.addReporter(trivialReporter);
-        jasmineEnv.specFilter = function(spec) {
-          return trivialReporter.specFilter(spec);
-        };
-        var currentWindowOnload = window.onload;
-        window.onload = function() {
-          if (currentWindowOnload) {
-            currentWindowOnload();
-          }
-          execJasmine();
-        };
-        function execJasmine() {
-          jasmineEnv.execute();
-        }
-      })();
-*/
+      function addFrame () {
+        var frame = KaitenNX.push();
+      }
     </script>
   </body>
 </html>
