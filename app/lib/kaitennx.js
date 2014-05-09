@@ -43,12 +43,37 @@
 
 		frm.prototype.focus = function () {
 			var self = this;
+
+			var pos = container.scrollLeft;
+			container.scrollLeft = 0;
+
+			var max_left = container.scrollWidth - container.clientWidth;
+			console.log(pos, max_left);
+
 			var rect = self.element.getBoundingClientRect();
+			container.scrollLeft = pos;
+
+			
+
 /*
 			$(container).animate({
-		        scrollLeft: rect.left + rect.width + $(container).scrollLeft()
-		    }, 300);*/
-		    self.element.scrollIntoView();
+		        scrollLeft: Math.min(max_left,rect.left)
+		    }, 1000);
+*/
+			/*
+			$(container).animate({
+		        scrollLeft: $(self.element).offset().left
+		    }, 300);
+	*/
+	
+		    //self.element.scrollIntoView();
+		    //container.scrollLeft += rect.left + rect.width;
+/*
+		    var pos = container.scrollLeft;
+		    container.style['margin-left'] = -pos + "px";
+		    container.style['overflow-x'] = 'scroll';
+
+		    console.log(pos);*/
 		}
 
 		frm.prototype.close = function () {
