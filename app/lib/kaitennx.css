@@ -14,8 +14,14 @@
 	height: 100%;
 }
 
+
 .knx-container .frame .title {
-	background-color:#0066FF;
+	background-color: #0066FF;
+}
+
+
+.knx-container .frame .title-focus {
+	background-color: #003D99;
 }
 
 .knx-container .frame .close {

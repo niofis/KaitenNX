@@ -12,8 +12,8 @@ describe('KaitenNX UI Lib', function() {
 
     afterEach(function () {
       var container  = document.getElementsByClassName('knx-container')[0]
-      if(container.contains(this.frame.element)) {
-        container.removeChild(this.frame.element);
+      if(container.contains(this.frame.dom())) {
+        container.removeChild(this.frame.dom());
       }
       this.frame = null;
     })
@@ -38,23 +38,44 @@ describe('KaitenNX UI Lib', function() {
       })
     })
 
+    it('should focus only one frame at a time', function () {
+      var frames = [];
+      var count = 10;
+
+      for(var i=0; i < count; ++i) {
+        frames.push(KaitenNX.push());
+        expect($('.title-focus')).toHaveLength(1);
+      }
+
+      
+
+      frames.forEach(function (f) {
+        f.close();
+      });
+
+    });
+
     describe('Frame', function () {
 
       it('should have a title', function () {
-        var title = $(this.frame.element).find('.title');
+        var title = $(this.frame.dom()).find('.title');
         expect(title.length).toBe(1);
       });
 
       it('should have a close link', function () {
-        var close = $(this.frame.element).find('.close');
+        var close = $(this.frame.dom()).find('.close');
         expect(close.length).toBe(1);
       });
 
       it('should remove the frame after click on close', function () {
-        var close =$(this.frame.element).find('.close')[0];
+        var close =$(this.frame.dom()).find('.close')[0];
         close.click();
         var el = $('.knx-container > .frame');
         expect(el.length).toBe(0);
+      });
+
+      it('should focus only a single frame at a time', function () {
+
       });
 
       describe('Events', function () {

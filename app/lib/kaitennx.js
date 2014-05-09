@@ -7,38 +7,152 @@
 	var h = window.innerHeight;
 	//console.log(container,container.clientWidth, container.clientHeight,w,h)
 
-	var Frame = (function () {
+	var DOMElement = (function () {
+		var dh = function (element) {
+			var self = this;
+			
+			self.element = document.createElement(element);
 
-		function createElement (onclose) {
-			var main = document.createElement('DIV');
-			main.className = 'frame';
-
-			var title = document.createElement('DIV');
-			title.className = 'title';
-			title.style.cssText = 'height:25px;';
-			main.appendChild(title);
-
-			var a_close = document.createElement('A');
-			a_close.className = 'close';
-			a_close.innerHTML = 'X';
-			a_close.style.cssText = "float:right;";
-			a_close.href = "javascript:;";
-			a_close.onclick = function () {
-				onclose();
-			}
-			title.appendChild(a_close);
-			return main;
+			self.style = {};
 		}
 
-		var frm = function () {
+		dh.prototype.addClass = function (name) {
 			var self = this;
 
-			self.element = createElement(self.close.bind(self));
+			self.element.className += ' ' + name;
+		}
+
+		dh.prototype.removeClass = function (name) {
+			 var self = this;
+
+			 self.swapClass(name, '');
+		}
+
+		dh.prototype.clearClass = function () {
+			var self = this;
+
+			self.element.className = '';
+		}
+
+		dh.prototype.swapClass = function (old_class, new_class) {
+			var self = this;
+
+			self.element.className = self.element.className.replace(old_class, new_class);
+		}
+
+		dh.prototype.css = function (opts) {
+			var self = this;
+
+			if(opts) {
+				for(var key in opts) {
+					self.style[key] = opts[key];
+				}
+			}
+
+			self.element.style.cssText = styleToString(self.style);
+			return self.element.style.cssText;
+		}
+
+		dh.prototype.appendChild = function (dom_element) {
+			var self = this;
+
+			self.element.appendChild(dom_element.element);
+		}
+
+		dh.prototype.html = function (html) {
+			var self = this;
+
+			self.element.innerHTML = html;
+
+			return self.element.innerHTML;
+		}
+
+		dh.prototype.attr = function (attrs) {
+			var self= this;
+
+			if(attrs) {
+				for(var key in attrs) {
+					self.element[key] = attrs[key];
+				}
+			}
+		}
+
+		dh.prototype.dom = function () {
+			var self = this;
+
+			return self.element;
+		}
+
+
+		function styleToString (style) {
+			var str = '';
+			
+			for(var key in style) {
+				str += key + ':' + style[key] + ';'
+			}
+
+			return str;
+		}
+
+		return dh;
+	})();
+
+	var Frame = (function () {
+
+		function createElement (title, onclose) {
+			var element = {};
+
+			var body = new DOMElement('DIV');
+			body.addClass('frame');
+
+			var title_bar = new DOMElement('DIV');
+			title_bar.addClass('title');
+			title_bar.css({height:'25px'});
+			body.appendChild(title_bar);
+
+			var title_text = new DOMElement('SPAN');
+			title_text.html(title);
+			title_bar.appendChild(title_text);
+
+			var a_close = new DOMElement('A');
+			a_close.addClass('close');
+			a_close.html('X');
+			a_close.css({float:'right'});
+			a_close.attr({
+				href:'javascript:;',
+				onclick: function () {
+					onclose();
+				}
+			});
+			title_bar.appendChild(a_close);
+
+			element.body = body;
+			element.title_bar = title_bar;
+			element.close = a_close;
+
+			return element;
+		}
+
+		var frm = function (opts) {
+			var self = this;
+
+			self.focused = false;
+
+			var op = opts || {};
+
+			self.element = createElement(op.title, self.close.bind(self));
 
 			self.listeners = {
 				close: []
 			}
 
+
+		}
+
+		frm.prototype.dom = function () {
+			var self = this;
+
+			return self.element.body.dom();
 		}
 
 		frm.prototype.focus = function () {
@@ -48,32 +162,32 @@
 			container.scrollLeft = 0;
 
 			var max_left = container.scrollWidth - container.clientWidth;
-			console.log(pos, max_left);
 
-			var rect = self.element.getBoundingClientRect();
+			var rect = self.dom().getBoundingClientRect();
 			container.scrollLeft = pos;
 
-			
+			var scroll =  (rect.left + rect.width) - container.clientWidth;
 
-/*
-			$(container).animate({
-		        scrollLeft: Math.min(max_left,rect.left)
-		    }, 1000);
-*/
-			/*
-			$(container).animate({
-		        scrollLeft: $(self.element).offset().left
-		    }, 300);
-	*/
-	
-		    //self.element.scrollIntoView();
-		    //container.scrollLeft += rect.left + rect.width;
-/*
-		    var pos = container.scrollLeft;
-		    container.style['margin-left'] = -pos + "px";
-		    container.style['overflow-x'] = 'scroll';
+			scroll = scroll < 0 ? 0 : scroll;
 
-		    console.log(pos);*/
+			container.scrollLeft = scroll;
+
+
+
+
+			KaitenNX.unfocusAll();
+
+			self.focused = true;
+
+			self.element.title_bar.addClass('title-focus');
+
+		}
+
+		frm.prototype.unfocus = function () {
+			var self = this;
+
+			self.focused = false;
+			self.element.title_bar.removeClass('title-focus');
 		}
 
 		frm.prototype.close = function () {
@@ -86,8 +200,13 @@
 				});
 			}
 
-			if(allow_close == true && container.contains(self.element)) {
-				container.removeChild(self.element);
+			if(allow_close == true && container.contains(self.dom())) {
+				container.removeChild(self.dom());
+				if(self.focused == true) {
+					KaitenNX.focusPrevious(self);
+					self.focused = false;
+				}
+				KaitenNX.remove(self);
 			}
 		}
 
@@ -103,14 +222,45 @@
 	})();
 
 	var knx = function () {
-
+		var self = this;
+		self.frames = [];
 	}
 
-	knx.prototype.push = function () {
-		var frame = new Frame();
-		container.appendChild(frame.element);
+	knx.prototype.push = function (opts) {
+		var self = this;
+		var frame = new Frame(opts);
+
+		container.appendChild(frame.dom());
 		frame.focus();
+		self.frames.push(frame);
+
 		return frame;
+	}
+
+	knx.prototype.unfocusAll = function () {
+		var self = this;
+
+		self.frames.forEach(function (f) {
+			f.unfocus();
+		});
+	}
+
+	knx.prototype.focusPrevious = function (frame) {
+		var self = this;
+		var idx = self.frames.indexOf(frame) - 1;
+
+		if(idx >= 0 && self.frames[idx]) {
+			self.frames[idx].focus();
+		}
+	}
+
+	knx.prototype.remove = function (frame) {
+		var self = this;
+		var idx = self.frames.indexOf(frame);
+
+		if(idx >= 0 && self.frames[idx]) {
+			self.frames.splice(idx,1);
+		}
 	}
 
 	window.KaitenNX = new knx();

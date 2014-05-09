@@ -46,8 +46,9 @@
     <script src="spec/kaitennxSpec.js"></script>
 
     <script type="text/javascript">
+    var count = 0;
       function addFrame () {
-        var frame = KaitenNX.push();
+        var frame = KaitenNX.push({title:++count});
       }
     </script>
   </body>
